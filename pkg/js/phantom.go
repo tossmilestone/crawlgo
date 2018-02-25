@@ -6,11 +6,13 @@ import (
 	"github.com/benbjohnson/phantomjs"
 )
 
+// Phantom describes a struct used to run phantom.
 type Phantom struct {
 	userAgent  string
 	pageEncode string
 }
 
+// NewPhantom creates a Phantom object.
 func NewPhantom() *Phantom {
 	return &Phantom{
 		userAgent:  "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36",
@@ -18,6 +20,7 @@ func NewPhantom() *Phantom {
 	}
 }
 
+// Run runs the phantom program.
 func (p *Phantom) Run() error {
 	if err := phantomjs.DefaultProcess.Open(); err != nil {
 		fmt.Println(err)
@@ -26,18 +29,22 @@ func (p *Phantom) Run() error {
 	return nil
 }
 
+// Stop stops the running phantom process.
 func (p *Phantom) Stop() {
 	phantomjs.DefaultProcess.Close()
 }
 
-func (p *Phantom) ExtractLinksFromSelector(pageUrl string, selector string) ([]interface{}, error) {
+// ExtractLinksFromSelector extracts links by the page url and DOM selector.
+// The links will be returned as an interface array. If no links found, an empty
+// interface array will be returned.
+func (p *Phantom) ExtractLinksFromSelector(pageURL string, selector string) ([]interface{}, error) {
 	page, err := phantomjs.CreateWebPage()
 	if err != nil {
 		return nil, err
 	}
 	defer page.Close()
 
-	if err := page.Open(pageUrl); err != nil {
+	if err := page.Open(pageURL); err != nil {
 		return nil, err
 	}
 

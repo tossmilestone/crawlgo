@@ -2,7 +2,6 @@
 
 set -o errexit
 set -o nounset
-set -o pipefail
 
 if [ -z "${PKG}" ]; then
     echo "PKG must be set"
@@ -20,7 +19,12 @@ fi
 export CGO_ENABLED=0
 export GOARCH="${ARCH}"
 
-go install                                                         \
-    -installsuffix "static"                                        \
-    -ldflags "-X ${PKG}/pkg/version.VERSION=${VERSION}"            \
+GO_SUBCMD="build"
+
+if [ "${INSTALL}" = "y" ]; then
+    GO_SUBCMD="install -installsuffix 'static'"
+fi
+
+go ${GO_SUBCMD}                                            \
+    -ldflags "-X ${PKG}/pkg/version.VERSION=${VERSION}"    \
     ./...

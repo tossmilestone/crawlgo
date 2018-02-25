@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"fmt"
+	"os"
 
 	"github.com/tossmilestone/crawlgo/cmd/crawlgo/app"
 )

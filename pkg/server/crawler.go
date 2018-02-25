@@ -11,8 +11,10 @@ import (
 
 	"github.com/tossmilestone/crawlgo/pkg/js"
 	"github.com/tossmilestone/crawlgo/pkg/util"
+	"time"
 )
 
+// Config stores the configuration of the Crawler.
 type Config struct {
 	SaveDir          string
 	Site             string
@@ -20,14 +22,17 @@ type Config struct {
 	DownloadSelector string
 }
 
+// Crawler describes a Crawler server.
 type Crawler struct {
-	config         *Config
-	phantom        *js.Phantom
-	total          int
-	downloaded     int
-	progress       chan int
+	config     *Config
+	phantom    *js.Phantom
+	total      int
+	failed     int
+	downloaded int
+	progress   chan int
 }
 
+// NewCrawler creates a Crawler object.
 func NewCrawler(config *Config) (*Crawler, error) {
 	// Create the save dir
 	if config.SaveDir == "" {
@@ -45,14 +50,15 @@ func NewCrawler(config *Config) (*Crawler, error) {
 	}
 
 	return &Crawler{
-		config:         config,
-		phantom:        js.NewPhantom(),
-		total:          0,
-		downloaded:     0,
-		progress:       make(chan int),
+		config:     config,
+		phantom:    js.NewPhantom(),
+		total:      0,
+		downloaded: 0,
+		progress:   make(chan int),
 	}, nil
 }
 
+// Run runs a crawler to execute the crawl tasks.
 func (c *Crawler) Run(stop chan struct{}) {
 	log.Print("Running crawler...")
 
@@ -75,6 +81,7 @@ func (c *Crawler) Run(stop chan struct{}) {
 func (c *Crawler) startCrawl() error {
 	// Site analysis
 	c.phantom.Run()
+	log.Printf("Opening %s ...", c.config.Site)
 	links, err := c.phantom.ExtractLinksFromSelector(c.config.Site, c.config.DownloadSelector)
 	if err != nil {
 		return err
@@ -88,9 +95,13 @@ func (c *Crawler) startCrawl() error {
 func (c *Crawler) displayProgress(stop chan struct{}) {
 	for {
 		select {
-		case <-c.progress:
-			c.downloaded++
-			log.Printf("Downloaded %d links of %d", c.downloaded, c.total)
+		case result := <-c.progress:
+			if result != 0 {
+				c.failed++
+			} else {
+				c.downloaded++
+			}
+			log.Printf("Downloaded %d, failed %d links of total %d", c.downloaded, c.failed, c.total)
 		case <-stop:
 			return
 		}
@@ -103,8 +114,10 @@ func (c *Crawler) parallelizeDownload(downloads []interface{}) {
 		err := c.download(downloads[index].(string))
 		if err != nil {
 			log.Print(err)
+			c.progress <- 1
+		} else {
+			c.progress <- 0
 		}
-		c.progress <- 0
 	}
 	util.Parallelize(c.config.Workers, len(downloads), downloadFile)
 }
@@ -118,13 +131,21 @@ func (c *Crawler) download(urlStr string) error {
 		return fmt.Errorf("%s exist", fileName)
 	}
 
-	out, err := os.Create(fileName)
+	httpClient := &http.Client{
+		Timeout: time.Second * 5,
+	}
 
-	resp, err := http.Get(urlStr)
+	resp, err := httpClient.Get(urlStr)
 	if err != nil {
 		return err
 	}
 	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf(`download failed of "%s"`, frags[len(frags)-1])
+	}
+
+	out, err := os.Create(fileName)
 
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
