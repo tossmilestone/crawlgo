@@ -45,8 +45,8 @@ func NewCrawlServerCommand() *cobra.Command {
 	opts := NewOptions()
 	cmd := &cobra.Command{
 		Version: version.VERSION,
-		Use:  "crawlgo",
-		Long: `The crawlgo is a server to crawl web sites in high concurrency written in golang.`,
+		Use:     "crawlgo",
+		Long:    `The crawlgo is a server to crawl web sites in high concurrency written in golang.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			opts.Run()
 		},
