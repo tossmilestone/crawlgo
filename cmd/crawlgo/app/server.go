@@ -24,10 +24,10 @@ func NewOptions() *Options {
 
 // AddFlags adds flags to the crawlgo command.
 func (o *Options) AddFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&o.config.Site, "site", "", "The site to crawl.")
-	fs.StringVar(&o.config.SaveDir, "save-dir", "./crawlgo", "The directory to save downloaded files.")
-	fs.IntVar(&o.config.Workers, "workers", 0, "The number of workers to run the crawl tasks. If no set, will be 'runtime.NumCPU()'.")
-	fs.StringVar(&o.config.DownloadSelector, "download-selector", "", "The DOM selector to query the links that will be downloaded from the site.")
+	fs.StringVar(&o.config.Site, "site", "", "The site to crawl")
+	fs.StringVar(&o.config.SaveDir, "save-dir", "./crawlgo", "The directory to save downloaded files")
+	fs.IntVar(&o.config.Workers, "workers", 0, "The number of workers to run the crawl tasks. If no set, will be 'runtime.NumCPU()'")
+	fs.StringVar(&o.config.DownloadSelector, "download-selector", "", "The DOM selector to query the links that will be downloaded from the site")
 }
 
 // Run runs the crawler server.
