@@ -4,6 +4,11 @@ ARCH := amd64
 
 PKG := github.com/tossmilestone/crawlgo
 
+PACKAGES := $(shell go list ./... | grep -v /vendor/)
+
+# Race detector is only supported on amd64.
+RACE := $(shell test $$(go env GOARCH) != "amd64" || (echo "-race"))
+
 VERSION := 1.0.0
 
 SRC_DIRS := cmd pkg
@@ -14,7 +19,7 @@ INSTALL := n
 
 all: setup install ci
 
-ci: setup build check
+ci: setup build check test
 
 install: INSTALL=y
 install: build
@@ -35,4 +40,8 @@ bin/$(BIN):
 check: lint
 
 lint:
-	@golint $(GOPACKAGES)
+	@test -z "$$(golint ./... | grep -v vendor/ | tee /dev/stderr)"
+
+test:
+	@go test -parallel 8 ${RACE} ${PACKAGES}
+
