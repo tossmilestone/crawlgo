@@ -64,8 +64,8 @@ func (h *fakeHTTPServer) listen() {
 		Addr:    ":8080",
 		Handler: mux,
 	}
-	h.server.ListenAndServe()
 	log.Print("Test http server listened on :8080 ...")
+	h.server.ListenAndServe()
 }
 
 func (h *fakeHTTPServer) stop() {

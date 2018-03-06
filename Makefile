@@ -19,7 +19,7 @@ INSTALL := n
 
 all: setup install ci
 
-ci: setup build check test
+ci: setup build check test coverage
 
 install: INSTALL=y
 install: build
@@ -28,6 +28,8 @@ build: bin/$(BIN)
 	
 setup:
 	@go get -u github.com/golang/lint/golint
+	@go get -u github.com/haya14busa/goverage
+	@go get github.com/mattn/goveralls
 
 bin/$(BIN):
 	@echo "building $@"
@@ -45,3 +47,6 @@ lint:
 test:
 	@go test -parallel 8 ${RACE} ${PACKAGES}
 
+coverage:
+	goverage -v -covermode=count -coverprofile=coverage.out ${PACKAGES}
+	goveralls -coverprofile=coverage.out -service=circle-ci -repotoken ${COVERALLS_TOKEN}

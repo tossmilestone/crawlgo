@@ -1,4 +1,4 @@
-# Crawlgo [![CircleCI](https://circleci.com/gh/tossmilestone/crawlgo.svg?style=shield)](https://circleci.com/gh/tossmilestone/crawlgo) [![Go Report Card](https://goreportcard.com/badge/github.com/tossmilestone/crawlgo)](https://goreportcard.com/report/github.com/tossmilestone/crawlgo)
+# Crawlgo [![CircleCI](https://circleci.com/gh/tossmilestone/crawlgo.svg?style=shield)](https://circleci.com/gh/tossmilestone/crawlgo) [![Coverage Status](https://coveralls.io/repos/github/tossmilestone/crawlgo/badge.svg?branch=master)](https://coveralls.io/github/tossmilestone/crawlgo?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/tossmilestone/crawlgo)](https://goreportcard.com/report/github.com/tossmilestone/crawlgo)
 
 Crawlgo is a crawler written in golang, it aims to be an extensible, scalable and high-performance distributed crawler system.
 
