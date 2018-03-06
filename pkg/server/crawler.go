@@ -9,8 +9,8 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/tossmilestone/crawlgo/pkg/web"
 	"github.com/tossmilestone/crawlgo/pkg/util"
+	"github.com/tossmilestone/crawlgo/pkg/web"
 	"time"
 )
 

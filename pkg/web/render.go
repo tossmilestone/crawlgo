@@ -6,4 +6,3 @@ type Render interface {
 	Stop()
 	ExtractLinksFromSelector(pageURL string, selector string) ([]interface{}, error)
 }
-

@@ -1,18 +1,18 @@
 package server
 
 import (
-	"os"
-	"testing"
-	"net/http"
-	"github.com/tossmilestone/crawlgo/pkg/util"
-	"fmt"
-	"runtime"
-	"github.com/tossmilestone/crawlgo/pkg/web"
-	"context"
-	"io"
 	"bytes"
-	"log"
+	"context"
+	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/tossmilestone/crawlgo/pkg/util"
+	"github.com/tossmilestone/crawlgo/pkg/web"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"runtime"
+	"testing"
 )
 
 func mkdirAllOK(path string, perm os.FileMode) error {
@@ -61,7 +61,7 @@ func (h *fakeHTTPServer) listen() {
 	mux := mux.NewRouter()
 	mux.HandleFunc("/test", h.handleTest).Methods("GET")
 	h.server = &http.Server{
-		Addr: ":8080",
+		Addr:    ":8080",
 		Handler: mux,
 	}
 	h.server.ListenAndServe()
@@ -75,28 +75,28 @@ func (h *fakeHTTPServer) stop() {
 
 func TestNewCrawler(t *testing.T) {
 	tests := []struct {
-		name string
-		saveDir string
+		name       string
+		saveDir    string
 		mkdirAllOK bool
-		workers int
+		workers    int
 	}{
 		{
-			name: "test 1",
-			saveDir: "",
+			name:       "test 1",
+			saveDir:    "",
 			mkdirAllOK: false,
-			workers: 0,
+			workers:    0,
 		},
 		{
-			name: "test 2",
-			saveDir: "./test",
+			name:       "test 2",
+			saveDir:    "./test",
 			mkdirAllOK: true,
-			workers: 3,
+			workers:    3,
 		},
 		{
-			name: "test 3",
-			saveDir: "",
+			name:       "test 3",
+			saveDir:    "",
 			mkdirAllOK: true,
-			workers: 0,
+			workers:    0,
 		},
 	}
 
@@ -149,16 +149,16 @@ func TestNewCrawler(t *testing.T) {
 }
 
 func TestCrawlerRun(t *testing.T) {
-	tests := []struct{
+	tests := []struct {
 		name  string
 		links int
 	}{
 		{
-			name: "test 1",
+			name:  "test 1",
 			links: 0,
 		},
 		{
-			name: "test 2",
+			name:  "test 2",
 			links: 3,
 		},
 	}
@@ -173,9 +173,9 @@ func TestCrawlerRun(t *testing.T) {
 		util.Stat = statNotExist
 		util.Create = createOk
 		c, err := NewCrawler(&Config{
-			SaveDir: "",
-			Site: "http://127.0.0.1:8080/",
-			Workers: 3,
+			SaveDir:          "",
+			Site:             "http://127.0.0.1:8080/",
+			Workers:          3,
 			DownloadSelector: ".test",
 		})
 		if err != nil {
