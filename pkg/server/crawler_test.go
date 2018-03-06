@@ -170,6 +170,7 @@ func TestCrawlerRun(t *testing.T) {
 	defer fakeH.stop()
 
 	for _, test := range tests {
+		util.MkdirAll = mkdirAllOK
 		util.Stat = statNotExist
 		util.Create = createOk
 		c, err := NewCrawler(&Config{
@@ -190,6 +191,7 @@ func TestCrawlerRun(t *testing.T) {
 			}
 		}
 	}
+	util.MkdirAll = util.DefaultMkdirAll
 	util.Stat = util.DefaultStatFunc
 	util.Create = util.DefaultCreateFunc
 }
