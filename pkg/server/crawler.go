@@ -11,7 +11,6 @@ import (
 
 	"github.com/tossmilestone/crawlgo/pkg/util"
 	"github.com/tossmilestone/crawlgo/pkg/web"
-	"time"
 )
 
 // Config stores the configuration of the Crawler.
@@ -29,7 +28,12 @@ type Crawler struct {
 	total      int
 	failed     int
 	downloaded int
-	progress   chan int
+	progress   chan downloadTask
+}
+
+type downloadTask struct {
+	urlPath string
+	success bool
 }
 
 // DefaultSaveDir defines the default save directory for downloaded files.
@@ -57,7 +61,7 @@ func NewCrawler(config *Config) (*Crawler, error) {
 		webRender:  web.NewPhantom(),
 		total:      0,
 		downloaded: 0,
-		progress:   make(chan int),
+		progress:   make(chan downloadTask),
 	}, nil
 }
 
@@ -98,17 +102,22 @@ func (c *Crawler) startCrawl(stop chan struct{}) error {
 }
 
 func (c *Crawler) displayProgress(stop chan struct{}) {
+	var failedDownload []downloadTask
 	for {
 		select {
 		case result := <-c.progress:
-			if result != 0 {
+			if !result.success {
 				c.failed++
+				failedDownload = append(failedDownload, result)
 			} else {
 				c.downloaded++
 			}
 			log.Printf("Downloaded %d, failed %d links of total %d", c.downloaded, c.failed, c.total)
-			if c.downloaded == c.total {
-				log.Printf("All downloaded, exit.")
+			if c.downloaded + c.failed == c.total {
+				if len(failedDownload) > 0 {
+					log.Printf("Download failed of: %s", failedDownload)
+				}
+				log.Printf("All done, exit.")
 				stop <- struct{}{}
 			}
 		case <-stop:
@@ -119,13 +128,18 @@ func (c *Crawler) displayProgress(stop chan struct{}) {
 
 func (c *Crawler) parallelizeDownload(downloads []interface{}) {
 	downloadFile := func(index int) {
+		download := downloadTask{
+			urlPath: downloads[index].(string),
+			success: true,
+		}
 		log.Printf("Start to download %s", downloads[index])
 		err := c.download(downloads[index].(string))
 		if err != nil {
 			log.Print(err)
-			c.progress <- 1
+			download.success = false
+			c.progress <- download
 		} else {
-			c.progress <- 0
+			c.progress <- download
 		}
 	}
 	util.Parallelize(c.config.Workers, len(downloads), downloadFile)
@@ -137,11 +151,12 @@ func (c *Crawler) download(urlStr string) error {
 
 	file, err := util.Stat(fileName)
 	if file != nil {
-		return fmt.Errorf("%s exist", fileName)
+		log.Printf("%s exist", fileName)
+		return nil
 	}
 
 	httpClient := &http.Client{
-		Timeout: time.Second * 5,
+		Timeout: 0,
 	}
 
 	resp, err := httpClient.Get(urlStr)

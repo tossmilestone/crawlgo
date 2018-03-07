@@ -26,6 +26,7 @@ crawlgo [flags]
 
 Flags:
       --download-selector string   The DOM selector to query the links that will be downloaded from the site
+      --enable-profile             enable profiling the program to start a pprof HTTP server on localhost:6360
   -h, --help                       help for crawlgo
       --save-dir string            The directory to save downloaded files. (default "./crawlgo")
       --site string                The site to crawl

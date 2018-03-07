@@ -2,6 +2,9 @@ package app
 
 import (
 	"log"
+	"net/http"
+	// Used for pprof
+	_ "net/http/pprof"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -13,6 +16,7 @@ import (
 // Options represents the options to run the crawler server.
 type Options struct {
 	config *server.Config
+	enableProfile bool
 }
 
 // NewOptions creates a new Options object.
@@ -28,6 +32,7 @@ func (o *Options) AddFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&o.config.SaveDir, "save-dir", "./crawlgo", "The directory to save downloaded files")
 	fs.IntVar(&o.config.Workers, "workers", 0, "The number of workers to run the crawl tasks. If no set, will be 'runtime.NumCPU()'")
 	fs.StringVar(&o.config.DownloadSelector, "download-selector", "", "The DOM selector to query the links that will be downloaded from the site")
+	fs.BoolVar(&o.enableProfile, "enable-profile", false, "enable profiling the program to start a pprof HTTP server on localhost:6360")
 }
 
 // Run runs the crawler server.
@@ -37,6 +42,14 @@ func (o *Options) Run() {
 		log.Fatal(err)
 		return
 	}
+
+	if o.enableProfile {
+		// Run pprof HTTP server
+		go func() {
+			log.Println(http.ListenAndServe("localhost:6360", nil))
+		}()
+	}
+
 	crawler.Run(make(chan struct{}))
 }
 

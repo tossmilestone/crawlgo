@@ -2,7 +2,6 @@ package server
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"github.com/gorilla/mux"
 	"github.com/tossmilestone/crawlgo/pkg/util"
@@ -58,19 +57,14 @@ func (h *fakeHTTPServer) handleTest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *fakeHTTPServer) listen() {
-	mux := mux.NewRouter()
-	mux.HandleFunc("/test", h.handleTest).Methods("GET")
+	router := mux.NewRouter()
+	router.HandleFunc("/test", h.handleTest).Methods("GET")
 	h.server = &http.Server{
 		Addr:    ":8080",
-		Handler: mux,
+		Handler: router,
 	}
 	log.Print("Test http server listened on :8080 ...")
 	h.server.ListenAndServe()
-}
-
-func (h *fakeHTTPServer) stop() {
-	h.server.Shutdown(context.Background())
-	log.Print("Test http server stopped")
 }
 
 func TestNewCrawler(t *testing.T) {
@@ -167,7 +161,6 @@ func TestCrawlerRun(t *testing.T) {
 	go func() {
 		fakeH.listen()
 	}()
-	defer fakeH.stop()
 
 	for _, test := range tests {
 		util.MkdirAll = mkdirAllOK
