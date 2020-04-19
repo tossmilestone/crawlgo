@@ -9,13 +9,13 @@ PACKAGES := $(shell go list ./... | grep -v /vendor/)
 # Race detector is only supported on amd64.
 RACE := $(shell test $$(go env GOARCH) != "amd64" || (echo "-race"))
 
-GOPATH := $(shell go env GOPATH)/bin
+GOPATH_BIN := $(shell go env GOPATH)/bin
 
-GOVERAGE :=  $(GOPATH)/goverage
+GOVERAGE :=  $(GOPATH_BIN)/goverage
 
-GOVERALLS := $(GOPATH)/goveralls
+GOVERALLS := $(GOPATH_BIN)/goveralls
 
-GOLINT := $(GOPATH)/golint
+GOLINT := $(GOPATH_BIN)/golint
 
 VERSION := 1.0.0
 

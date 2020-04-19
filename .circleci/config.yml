@@ -7,6 +7,5 @@ jobs:
     working_directory: /go/src/github.com/tossmilestone/crawlgo
     steps:
       - checkout
-
       - run: make setup
       - run: make ci
