@@ -115,7 +115,7 @@ func (c *Crawler) displayProgress(stop chan struct{}) {
 			log.Printf("Downloaded %d, failed %d links of total %d", c.downloaded, c.failed, c.total)
 			if c.downloaded + c.failed == c.total {
 				if len(failedDownload) > 0 {
-					log.Printf("Download failed of: %s", failedDownload)
+					log.Printf("Download failed of: %+v", failedDownload)
 				}
 				log.Printf("All done, exit.")
 				stop <- struct{}{}

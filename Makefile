@@ -49,4 +49,6 @@ test:
 
 coverage:
 	goverage -v -covermode=count -coverprofile=coverage.out ${PACKAGES}
+ifneq "${COVERALLS_TOKEN}" ""
 	goveralls -coverprofile=coverage.out -service=circle-ci -repotoken ${COVERALLS_TOKEN}
+endif
