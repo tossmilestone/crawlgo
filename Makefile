@@ -9,6 +9,14 @@ PACKAGES := $(shell go list ./... | grep -v /vendor/)
 # Race detector is only supported on amd64.
 RACE := $(shell test $$(go env GOARCH) != "amd64" || (echo "-race"))
 
+GOPATH := $(shell go env GOPATH)/bin
+
+GOVERAGE :=  $(GOPATH)/goverage
+
+GOVERALLS := $(GOPATH)/goveralls
+
+GOLINT := $(GOPATH)/golint
+
 VERSION := 1.0.0
 
 SRC_DIRS := cmd pkg
@@ -42,13 +50,13 @@ bin/$(BIN):
 check: lint
 
 lint:
-	@test -z "$$(golint ./... | grep -v vendor/ | tee /dev/stderr)"
+	@test -z "$$($(GOLINT) ./... | grep -v vendor/ | tee /dev/stderr)"
 
 test:
 	@go test -parallel 8 ${RACE} ${PACKAGES}
 
 coverage:
-	goverage -v -covermode=count -coverprofile=coverage.out ${PACKAGES}
+	$(GOVERAGE) -v -covermode=count -coverprofile=coverage.out ${PACKAGES}
 ifneq "${COVERALLS_TOKEN}" ""
-	goveralls -coverprofile=coverage.out -service=circle-ci -repotoken ${COVERALLS_TOKEN}
+	$(GOVERALLS) -coverprofile=coverage.out -service=circle-ci -repotoken ${COVERALLS_TOKEN}
 endif
