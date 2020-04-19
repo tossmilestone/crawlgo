@@ -27,7 +27,7 @@ install: build
 build: bin/$(BIN)
 	
 setup:
-	@go get -u github.com/golang/lint/golint
+	@go get -u golang.org/x/lint/golint
 	@go get -u github.com/haya14busa/goverage
 	@go get github.com/mattn/goveralls
 
